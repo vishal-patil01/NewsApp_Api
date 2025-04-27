@@ -1,0 +1,35 @@
+using Serilog;
+using Serilog.Events;
+using NewsApp.API.Extensions;
+
+#region Configuring builder
+var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseKestrel(options =>
+{
+    options.AddServerHeader = false;
+});
+builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
+             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: false, reloadOnChange: true)
+             .AddEnvironmentVariables();
+#endregion
+
+#region Add Services to the Container.
+builder.Services.SetupDependency(builder.Configuration);
+
+//Logging Configuration
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((ctx, lc) => lc
+                 .WriteTo.Logger(lc => lc
+                     .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Error)
+                     .WriteTo.File("logs/Error_.txt", LogEventLevel.Error, rollingInterval: RollingInterval.Day))
+                 .WriteTo.Logger(lc => lc
+                         .Filter.ByIncludingOnly(evt => evt.Level <= LogEventLevel.Fatal)
+                         .WriteTo.File("logs/logs_.txt", rollingInterval: RollingInterval.Day)));
+#endregion
+
+#region Configure the HTTP request pipeline.
+var app = builder.Build();
+app.ConfigureMiddlewares();
+app.Run();
+#endregion
