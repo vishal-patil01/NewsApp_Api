@@ -12,13 +12,13 @@ namespace NewsApp.Services.Implementation
         private readonly ResponseHelper _responseHelper;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IMemoryCacheWrapper _memoryCache;
-        private const string CacheKey = "TopStories";
+        private static string CacheKey = $"TopStories_{AppSettings.ConfigurationSettings.MaxStoriesCount}";
 
         public NewsService(IHttpClientFactory httpClientFactory, IMemoryCacheWrapper memoryCache)
         {
             _httpClientFactory = httpClientFactory;
             _memoryCache = memoryCache;
-            this._responseHelper = new ResponseHelper();
+            _responseHelper = new ResponseHelper();
         }
 
         public async Task<BaseResponse> GetStoriesAsync(string? searchQuery = null)
@@ -36,41 +36,41 @@ namespace NewsApp.Services.Implementation
             {
                 return _responseHelper.HandleSuccess(cachedStories, "Stories fetched Successfully");
             }
-            var filteredStories = cachedStories
+            List<Story>? filteredStories = cachedStories
                .Where(story => !string.IsNullOrEmpty(story.Title) &&
                                story.Title.ToLower().Contains(searchQuery.ToLower()))
                .ToList();
-            return filteredStories?.Count() <= 0 
+            return filteredStories?.Count() <= 0
                 ? _responseHelper.HandleNotFound("Stories")
                 : _responseHelper.HandleSuccess(filteredStories, "Stories fetched Successfully");
         }
 
         private async Task<List<Story>> FetchTopStoriesAsync()
         {
-            var client = _httpClientFactory.CreateClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/topstories.json");
-            var response = await client.SendAsync(request);
+            HttpClient client = _httpClientFactory.CreateClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/topstories.json");
+            HttpResponseMessage response = await client.SendAsync(request);
             List<int> storyIds = new List<int>();
-            var stories = new List<Story>();
+            List<Story> stories = new List<Story>();
 
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                storyIds= JsonConvert.DeserializeObject<List<int>>(content);
+                string content = await response.Content.ReadAsStringAsync();
+                storyIds = JsonConvert.DeserializeObject<List<int>>(content);
             }
 
-            foreach (var id in storyIds)
+            foreach (int id in storyIds)
             {
-                var storyUrl = $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/item/{id}.json";
-                var storyResponse = await client.GetStringAsync(storyUrl);
-                var story = JsonConvert.DeserializeObject<Story>(storyResponse);
+                string storyUrl = $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/item/{id}.json";
+                string storyResponse = await client.GetStringAsync(storyUrl);
+                Story? story = JsonConvert.DeserializeObject<Story>(storyResponse);
 
                 if (story != null && !string.IsNullOrEmpty(story.Url))
                 {
                     stories.Add(story);
                 }
 
-                if (stories.Count >= 200)
+                if (stories.Count >= AppSettings.ConfigurationSettings.MaxStoriesCount)
                 {
                     break;
                 }

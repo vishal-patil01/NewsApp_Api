@@ -19,7 +19,7 @@ namespace NewsApp.Services.Implementation
 
         public void Set<T>(object key, T value, TimeSpan expiration)
         {
-            var options = new MemoryCacheEntryOptions
+            MemoryCacheEntryOptions options = new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = expiration
             };

@@ -1,7 +1,7 @@
 
+using Microsoft.AspNetCore.Mvc;
 using NewsApp.Services.Helpers;
 using NewsApp.Services.Interface;
-using Microsoft.AspNetCore.Mvc;
 
 namespace NewsApp.API.Controllers
 {
@@ -21,7 +21,7 @@ namespace NewsApp.API.Controllers
         [HttpGet("stories")]
         public async Task<IActionResult> GetStories([FromQuery] string? searchTerm = null)
         {
-            var data = await _newsServic.GetStoriesAsync(searchTerm);
+            Models.Contracts.BaseResponse data = await _newsServic.GetStoriesAsync(searchTerm);
             return _responseHelper.HandleResponse(this, data);
         }
     }

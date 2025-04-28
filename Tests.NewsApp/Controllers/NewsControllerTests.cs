@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NewsApp.API.Controllers;
 using NewsApp.Models.Contracts;
 using NewsApp.Services.Interface;
-using System.Net;
 
 namespace Tests.NewsApp.Controllers
 {
@@ -17,8 +17,8 @@ namespace Tests.NewsApp.Controllers
 
         public NewsControllerTests()
         {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-            this.mockNewsService = this.mockRepository.Create<INewsService>();
+            mockRepository = new MockRepository(MockBehavior.Strict);
+            mockNewsService = mockRepository.Create<INewsService>();
             headers = new Dictionary<string, string>
             {
                 { "CorrelationId", "test-correlation-id" }
@@ -26,10 +26,10 @@ namespace Tests.NewsApp.Controllers
         }
         public static HttpContext CreateHttpContext(Dictionary<string, string> headers = null)
         {
-            var httpContext = new DefaultHttpContext();
+            DefaultHttpContext httpContext = new DefaultHttpContext();
             if (headers != null)
             {
-                foreach (var dict in headers)
+                foreach (KeyValuePair<string, string> dict in headers)
                 {
                     httpContext.Request.Headers.Add(dict.Key, dict.Value);
                 }
@@ -40,7 +40,7 @@ namespace Tests.NewsApp.Controllers
 
         private NewsController CreateNewsController()
         {
-            var controller= new NewsController(this.mockNewsService.Object);
+            NewsController controller = new NewsController(mockNewsService.Object);
             controller.ControllerContext = new ControllerContext()
             {
                 HttpContext = CreateHttpContext(headers)
@@ -52,81 +52,81 @@ namespace Tests.NewsApp.Controllers
         public async Task GetStories_WhenCalledWithNullSearchTerm_ReturnsExpectedResult()
         {
             // Arrange
-            var newsController = this.CreateNewsController();
+            NewsController newsController = CreateNewsController();
             string? searchTerm = null;
-            var expectedResponse = new BaseResponse
+            BaseResponse expectedResponse = new BaseResponse
             {
                 Success = true,
                 Data = new { Stories = new[] { "Story1", "Story2" } },
                 StatusCode = HttpStatusCode.OK
             };
 
-            this.mockNewsService
+            mockNewsService
                 .Setup(service => service.GetStoriesAsync(searchTerm))
                 .ReturnsAsync(expectedResponse);
 
             // Act
-            var result = await newsController.GetStories(searchTerm);
+            IActionResult result = await newsController.GetStories(searchTerm);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
+            OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal((int)HttpStatusCode.OK, okResult.StatusCode);
             Assert.Equal(expectedResponse, okResult.Value);
-            this.mockRepository.VerifyAll();
+            mockRepository.VerifyAll();
         }
 
         [Fact]
         public async Task GetStories_WhenServiceFails_ReturnsInternalServerError()
         {
             // Arrange
-            var newsController = this.CreateNewsController();
+            NewsController newsController = CreateNewsController();
             string? searchTerm = "test";
-            var expectedResponse = new BaseResponse
+            BaseResponse expectedResponse = new BaseResponse
             {
                 Success = false,
                 Message = "An error occurred",
                 StatusCode = HttpStatusCode.InternalServerError
             };
 
-            this.mockNewsService
+            mockNewsService
                 .Setup(service => service.GetStoriesAsync(searchTerm))
                 .ReturnsAsync(expectedResponse);
 
             // Act
-            var result = await newsController.GetStories(searchTerm);
+            IActionResult result = await newsController.GetStories(searchTerm);
 
             // Assert
-            var objectResult = Assert.IsType<ObjectResult>(result);
+            ObjectResult objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal((int)HttpStatusCode.InternalServerError, objectResult.StatusCode);
             Assert.Equal(expectedResponse, objectResult.Value);
-            this.mockRepository.VerifyAll();
+            mockRepository.VerifyAll();
         }
 
         [Fact]
         public async Task GetStories_WhenCalledWithValidSearchTerm_ReturnsExpectedStories()
         {
             // Arrange
-            var newsController = this.CreateNewsController();
+            NewsController newsController = CreateNewsController();
             string searchTerm = "technology";
-            var expectedResponse = new BaseResponse
+            BaseResponse expectedResponse = new BaseResponse
             {
                 Success = true,
                 Data = new { Stories = new[] { "Tech Story1", "Tech Story2" } },
                 StatusCode = HttpStatusCode.OK
             };
 
-            this.mockNewsService
+            mockNewsService
                 .Setup(service => service.GetStoriesAsync(searchTerm))
                 .ReturnsAsync(expectedResponse);
 
             // Act
-            var result = await newsController.GetStories(searchTerm);
+            IActionResult result = await newsController.GetStories(searchTerm);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
+            OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal((int)HttpStatusCode.OK, okResult.StatusCode);
             Assert.Equal(expectedResponse, okResult.Value);
-            this.mockRepository.VerifyAll();
+            mockRepository.VerifyAll();
         }
     }
 }

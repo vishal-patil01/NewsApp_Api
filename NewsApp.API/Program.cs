@@ -1,10 +1,10 @@
-using Serilog;
-using Serilog.Events;
 using NewsApp.API.Extensions;
 using NewsApp.Models.Configurations;
+using Serilog;
+using Serilog.Events;
 
 #region Configuring builder
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel(options =>
 {
     options.AddServerHeader = false;
@@ -31,7 +31,7 @@ builder.Host.UseSerilog((ctx, lc) => lc
 #endregion
 
 #region Configure the HTTP request pipeline.
-var app = builder.Build();
+WebApplication app = builder.Build();
 app.ConfigureMiddlewares();
 app.Run();
 #endregion

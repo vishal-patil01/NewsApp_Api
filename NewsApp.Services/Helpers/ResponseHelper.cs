@@ -1,6 +1,6 @@
-using NewsApp.Models.Contracts;
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using NewsApp.Models.Contracts;
 
 namespace NewsApp.Services.Helpers
 {
@@ -8,10 +8,11 @@ namespace NewsApp.Services.Helpers
     {
         public ActionResult HandleResponse(ControllerBase controller, BaseResponse baseResponse)
         {
-            if (controller.HttpContext.Request.Headers.TryGetValue("CorrelationId", out var value))
+            if (controller.HttpContext.Request.Headers.TryGetValue("CorrelationId", out Microsoft.Extensions.Primitives.StringValues value))
             {
                 baseResponse.CorrelationId = value;
-            };
+            }
+            ;
             baseResponse.CorrelationId = Guid.NewGuid().ToString();
             return baseResponse.StatusCode switch
             {
@@ -35,16 +36,6 @@ namespace NewsApp.Services.Helpers
             };
         }
 
-        public BaseResponse HandleConflict(string entityName)
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                Message = entityName + " already exists.",
-                Success = false
-            };
-        }
-
         public BaseResponse HandleNotFound(string entityName)
         {
             return new BaseResponse
@@ -55,130 +46,6 @@ namespace NewsApp.Services.Helpers
             };
         }
 
-        public BaseResponse HandleBadRequest(string message)
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.BadRequest,
-                Message = message,
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleDBInsertionResponse(string entity, object data, long? result)
-        {
-            if (result > 0)
-            {
-                return new BaseResponse
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Data Added in " + entity + " ",
-                    Data = data,
-                    Success = true
-                };
-            }
-
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.InternalServerError,
-                Message = entity + " Insertion failed",
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleDBUpdateResponse(string entity, object data, long? result)
-        {
-            if (result > 0)
-            {
-                return new BaseResponse
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Data Updated in " + entity + " ",
-                    Data = data,
-                    Success = true
-                };
-            }
-
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.ExpectationFailed,
-                Message = entity + " Updation failed",
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleDelete(string entity, int? rows)
-        {
-            if (rows > 0)
-            {
-                return new BaseResponse
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Message = "Data Deleted in " + entity + " ",
-                    Success = true
-                };
-            }
-
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.ExpectationFailed,
-                Message = entity + " Deletion failed",
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleExceptionResponse(Exception ex)
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.ExpectationFailed,
-                Message = "Exception Occurred: " + ex.Message,
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleServerErrorResponse(Exception ex)
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.InternalServerError,
-                Message = "Internal Server Error: " + ex.Message,
-                // Data = ex,
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleServiceUnavailableError(string message)
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.ServiceUnavailable,
-                Message = (message ?? ""),
-                Success = false
-            };
-        }
-
-        public BaseResponse HandleAuthFailure()
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.Unauthorized,
-                Message = "Invalid Access.",
-                Data = null,
-                Success = false
-            };
-        }
-
-        public BaseResponse HandlePermissionFailure()
-        {
-            return new BaseResponse
-            {
-                StatusCode = HttpStatusCode.Unauthorized,
-                Message = "The user does not have the permission to perform the task",
-                Data = null,
-                Success = false
-            };
-        }
     }
 }
 

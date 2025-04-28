@@ -1,7 +1,7 @@
-using NewsApp.Models.Contracts;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 using System.Net;
+using Microsoft.Extensions.Primitives;
+using NewsApp.Models.Contracts;
+using Newtonsoft.Json;
 
 namespace NewsApp.API.Middlewares;
 
@@ -37,7 +37,7 @@ public class ExceptionHandlerMiddleware
 
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        var errorResponse = new BaseResponse();
+        BaseResponse errorResponse = new BaseResponse();
         errorResponse.Message = "we are unable to process your request at this time";
         errorResponse.CorrelationId = correlationId;
         await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));

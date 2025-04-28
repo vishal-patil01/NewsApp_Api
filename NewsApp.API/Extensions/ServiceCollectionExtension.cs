@@ -1,9 +1,8 @@
-using NewsApp.Services.Interface;
-using NewsApp.Services.Implementation;
-using NewsApp.API.Middlewares;
 using Microsoft.AspNetCore.ResponseCompression;
+using NewsApp.API.Middlewares;
+using NewsApp.Services.Implementation;
+using NewsApp.Services.Interface;
 using Newtonsoft.Json;
-using NewsApp.Models.Configurations;
 
 
 namespace NewsApp.API.Extensions
@@ -34,8 +33,8 @@ namespace NewsApp.API.Extensions
             serviceCollection.AddMemoryCache();
             serviceCollection.AddHttpContextAccessor();
             serviceCollection.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            serviceCollection.AddSingleton<INewsService,NewsService>();
-            serviceCollection.AddSingleton<IMemoryCacheWrapper,MemoryCacheWrapper>();
+            serviceCollection.AddSingleton<INewsService, NewsService>();
+            serviceCollection.AddSingleton<IMemoryCacheWrapper, MemoryCacheWrapper>();
             serviceCollection.AddSwaggerGen();
 
             return serviceCollection;
@@ -50,11 +49,9 @@ namespace NewsApp.API.Extensions
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseSecurityHeader();
             app.UseResponseCompression();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
-
 
             app.UseCors(x =>
             {
