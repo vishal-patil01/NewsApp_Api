@@ -32,10 +32,13 @@ namespace NewsApp.Services.Implementation
                 _memoryCache.Set(CacheKey, cachedStories, TimeSpan.FromHours(8));
             }
 
+            // If search query is not provided, return cached stories
             if (string.IsNullOrEmpty(searchQuery))
             {
                 return _responseHelper.HandleSuccess(cachedStories, "Stories fetched Successfully");
             }
+
+            // Filter stories based on search query
             List<Story>? filteredStories = cachedStories
                .Where(story => !string.IsNullOrEmpty(story.Title) &&
                                story.Title.ToLower().Contains(searchQuery.ToLower()))
@@ -45,13 +48,17 @@ namespace NewsApp.Services.Implementation
                 : _responseHelper.HandleSuccess(filteredStories, "Stories fetched Successfully");
         }
 
+
         private async Task<List<Story>> FetchTopStoriesAsync()
         {
-            HttpClient client = _httpClientFactory.CreateClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/topstories.json");
-            HttpResponseMessage response = await client.SendAsync(request);
             List<int> storyIds = new List<int>();
             List<Story> stories = new List<Story>();
+
+            HttpClient client = _httpClientFactory.CreateClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get,
+                                            $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/topstories.json");
+            // Call hacker news API to get top stories
+            HttpResponseMessage response = await client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -62,14 +69,16 @@ namespace NewsApp.Services.Implementation
             foreach (int id in storyIds)
             {
                 string storyUrl = $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/item/{id}.json";
+                // Call hacker news API to get story details
                 string storyResponse = await client.GetStringAsync(storyUrl);
                 Story? story = JsonConvert.DeserializeObject<Story>(storyResponse);
 
+                // Check if the story is not null and has a URL
                 if (story != null && !string.IsNullOrEmpty(story.Url))
                 {
                     stories.Add(story);
                 }
-
+                // Limit the number of stories to the maximum count specified in the configuration
                 if (stories.Count >= AppSettings.ConfigurationSettings.MaxStoriesCount)
                 {
                     break;

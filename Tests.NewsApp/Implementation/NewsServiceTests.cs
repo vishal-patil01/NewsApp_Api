@@ -158,7 +158,7 @@ namespace Tests.NewsApp.Implementation
                 .Returns(httpClient);
 
             // Act
-            global::NewsApp.Models.Contracts.BaseResponse result = await service.GetStoriesAsync(searchQuery);
+            var result = await service.GetStoriesAsync(searchQuery);
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
@@ -182,7 +182,7 @@ namespace Tests.NewsApp.Implementation
        .Returns(true);
 
             // Act
-            global::NewsApp.Models.Contracts.BaseResponse result = await service.GetStoriesAsync(searchQuery);
+            var result = await service.GetStoriesAsync(searchQuery);
 
             // Assert
             Assert.True(result.Success);
