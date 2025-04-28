@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Moq.Protected;
+using NewsApp.Models.Configurations;
 using NewsApp.Models.Entities;
 using NewsApp.Services.Implementation;
 using NewsApp.Services.Interface;
@@ -18,9 +19,13 @@ namespace Tests.NewsApp.Implementation
         public NewsServiceTests()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
+            
             this.mockHttpClientFactory = this.mockRepository.Create<IHttpClientFactory>();
             this.mockMemoryCache = this.mockRepository.Create<IMemoryCacheWrapper>();
+            AppSettings.ConfigurationSettings = new ConfigurationSettings()
+            {
+                NewsServiceBaseUrl = "www.test.com"
+            };
         }
 
         private NewsService CreateService()

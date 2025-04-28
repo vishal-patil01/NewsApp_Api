@@ -1,3 +1,4 @@
+using NewsApp.Models.Configurations;
 using NewsApp.Models.Contracts;
 using NewsApp.Models.Entities;
 using NewsApp.Services.Helpers;
@@ -12,7 +13,6 @@ namespace NewsApp.Services.Implementation
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IMemoryCacheWrapper _memoryCache;
         private const string CacheKey = "TopStories";
-        private const string TopStoriesUrl = "https://hacker-news.firebaseio.com/v0/topstories.json";
 
         public NewsService(IHttpClientFactory httpClientFactory, IMemoryCacheWrapper memoryCache)
         {
@@ -48,7 +48,7 @@ namespace NewsApp.Services.Implementation
         private async Task<List<Story>> FetchTopStoriesAsync()
         {
             var client = _httpClientFactory.CreateClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, TopStoriesUrl);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/topstories.json");
             var response = await client.SendAsync(request);
             List<int> storyIds = new List<int>();
             var stories = new List<Story>();
@@ -61,7 +61,7 @@ namespace NewsApp.Services.Implementation
 
             foreach (var id in storyIds)
             {
-                var storyUrl = $"https://hacker-news.firebaseio.com/v0/item/{id}.json";
+                var storyUrl = $"{AppSettings.ConfigurationSettings.NewsServiceBaseUrl}/item/{id}.json";
                 var storyResponse = await client.GetStringAsync(storyUrl);
                 var story = JsonConvert.DeserializeObject<Story>(storyResponse);
 

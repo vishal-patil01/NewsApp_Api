@@ -1,6 +1,7 @@
 using Serilog;
 using Serilog.Events;
 using NewsApp.API.Extensions;
+using NewsApp.Models.Configurations;
 
 #region Configuring builder
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
 #endregion
 
 #region Add Services to the Container.
+AppSettings.ConfigurationSettings = builder.Configuration.GetSection("ConfigurationSettings").Get<ConfigurationSettings>();
 builder.Services.SetupDependency(builder.Configuration);
 
 //Logging Configuration

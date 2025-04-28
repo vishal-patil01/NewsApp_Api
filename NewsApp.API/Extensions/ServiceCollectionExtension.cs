@@ -3,6 +3,7 @@ using NewsApp.Services.Implementation;
 using NewsApp.API.Middlewares;
 using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
+using NewsApp.Models.Configurations;
 
 
 namespace NewsApp.API.Extensions
@@ -21,6 +22,7 @@ namespace NewsApp.API.Extensions
                   options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
                   options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
               });
+
 
             // add service extensions
             serviceCollection.AddResponseCompression(opt =>
