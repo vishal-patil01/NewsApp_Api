@@ -4,6 +4,6 @@ namespace NewsApp.Services.Interface
 {
     public interface INewsService
     {
-        Task<BaseResponse> GetStoriesAsync(string? searchQuery = null);
+        Task<Response> GetStoriesAsync(string? searchQuery = null);
     }
 }

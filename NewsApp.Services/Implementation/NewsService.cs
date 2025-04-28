@@ -21,7 +21,12 @@ namespace NewsApp.Services.Implementation
             _responseHelper = new ResponseHelper();
         }
 
-        public async Task<BaseResponse> GetStoriesAsync(string? searchQuery = null)
+        /// <summary>
+        /// Gets news stories; returns cached stories if available.
+        /// </summary>
+        /// <param name="searchQuery">Optional query to filter stories by title.</param>
+        /// <returns>A <see cref="Response"/> containing news stories.</returns>
+        public async Task<Response> GetStoriesAsync(string? searchQuery = null)
         {
             // Check if cached data exists
             if (!_memoryCache.TryGetValue(CacheKey, out List<Story> cachedStories))
@@ -48,7 +53,10 @@ namespace NewsApp.Services.Implementation
                 : _responseHelper.HandleSuccess(filteredStories, "Stories fetched Successfully");
         }
 
-
+        /// <summary>
+        /// Fetches top stories from the external API.
+        /// </summary>
+        /// <returns>A list of <see cref="Story"/> objects.</returns>
         private async Task<List<Story>> FetchTopStoriesAsync()
         {
             List<int> storyIds = new List<int>();

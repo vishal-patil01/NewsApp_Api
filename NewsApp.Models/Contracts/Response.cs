@@ -3,7 +3,7 @@ using System.Net;
 
 namespace NewsApp.Models.Contracts
 {
-    public class BaseResponse
+    public class Response
     {
         public string Message { get; set; } = string.Empty;
         public string CorrelationId { get; set; } = string.Empty;

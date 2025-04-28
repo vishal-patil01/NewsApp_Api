@@ -6,7 +6,7 @@ namespace NewsApp.Services.Helpers
 {
     public class ResponseHelper
     {
-        public ActionResult HandleResponse(ControllerBase controller, BaseResponse baseResponse)
+        public ActionResult HandleResponse(ControllerBase controller, Response baseResponse)
         {
             if (controller.HttpContext.Request.Headers.TryGetValue("CorrelationId", out Microsoft.Extensions.Primitives.StringValues value))
             {
@@ -25,9 +25,9 @@ namespace NewsApp.Services.Helpers
             };
         }
 
-        public BaseResponse HandleSuccess(object? data = null, string? message = "")
+        public Response HandleSuccess(object? data = null, string? message = "")
         {
-            return new BaseResponse
+            return new Response
             {
                 StatusCode = HttpStatusCode.OK,
                 Message = message,
@@ -36,9 +36,9 @@ namespace NewsApp.Services.Helpers
             };
         }
 
-        public BaseResponse HandleNotFound(string entityName)
+        public Response HandleNotFound(string entityName)
         {
-            return new BaseResponse
+            return new Response
             {
                 StatusCode = HttpStatusCode.NotFound,
                 Message = entityName + " not found.",

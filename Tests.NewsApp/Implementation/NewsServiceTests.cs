@@ -52,7 +52,7 @@ namespace Tests.NewsApp.Implementation
                 .Returns(true);
 
             // Act
-            global::NewsApp.Models.Contracts.BaseResponse result = await service.GetStoriesAsync(searchQuery);
+            global::NewsApp.Models.Contracts.Response result = await service.GetStoriesAsync(searchQuery);
 
             // Assert
             Assert.True(result.Success);
@@ -112,7 +112,7 @@ namespace Tests.NewsApp.Implementation
 
             HttpClient httpClient = new HttpClient(mockHttpMessageHandler.Object);
             // Act
-            global::NewsApp.Models.Contracts.BaseResponse result = await service.GetStoriesAsync(searchQuery);
+            global::NewsApp.Models.Contracts.Response result = await service.GetStoriesAsync(searchQuery);
 
             // Assert
             Assert.True(result.Success);

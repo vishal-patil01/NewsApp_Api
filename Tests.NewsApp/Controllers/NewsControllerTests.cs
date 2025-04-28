@@ -54,7 +54,7 @@ namespace Tests.NewsApp.Controllers
             // Arrange
             NewsController newsController = CreateNewsController();
             string? searchTerm = null;
-            BaseResponse expectedResponse = new BaseResponse
+            Response expectedResponse = new Response
             {
                 Success = true,
                 Data = new { Stories = new[] { "Story1", "Story2" } },
@@ -81,7 +81,7 @@ namespace Tests.NewsApp.Controllers
             // Arrange
             NewsController newsController = CreateNewsController();
             string? searchTerm = "test";
-            BaseResponse expectedResponse = new BaseResponse
+            Response expectedResponse = new Response
             {
                 Success = false,
                 Message = "An error occurred",
@@ -108,7 +108,7 @@ namespace Tests.NewsApp.Controllers
             // Arrange
             NewsController newsController = CreateNewsController();
             string searchTerm = "technology";
-            BaseResponse expectedResponse = new BaseResponse
+            Response expectedResponse = new Response
             {
                 Success = true,
                 Data = new { Stories = new[] { "Tech Story1", "Tech Story2" } },

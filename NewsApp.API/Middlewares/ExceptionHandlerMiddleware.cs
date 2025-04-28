@@ -37,7 +37,7 @@ public class ExceptionHandlerMiddleware
 
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        BaseResponse errorResponse = new BaseResponse();
+        Response errorResponse = new Response();
         errorResponse.Message = "we are unable to process your request at this time";
         errorResponse.CorrelationId = correlationId;
         await context.Response.WriteAsync(JsonConvert.SerializeObject(errorResponse));
